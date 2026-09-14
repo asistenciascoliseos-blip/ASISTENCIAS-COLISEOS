@@ -5,6 +5,18 @@ function sendJson(response, status, body) {
     response.end(JSON.stringify(body));
 }
 
+async function telegramRequest(token, method, payload) {
+    const response = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
+        method: 'POST',
+        headers: payload instanceof FormData ? undefined : { 'Content-Type': 'application/json' },
+        body: payload instanceof FormData ? payload : JSON.stringify(payload)
+    });
+
+    let result = {};
+    try { result = await response.json(); } catch (error) { result = {}; }
+    return { ok: response.ok, status: response.status, result };
+}
+
 module.exports = async function attendance(request, response) {
     if (request.method !== 'POST') {
         response.setHeader('Allow', 'POST');
@@ -18,7 +30,7 @@ module.exports = async function attendance(request, response) {
     }
 
     const body = typeof request.body === 'string' ? JSON.parse(request.body) : request.body;
-    const { photo, user, movement, date } = body || {};
+    const { photo, user, movement, date, newMembers, oldMembers } = body || {};
     if (!photo || !user?.name || !user?.id || !movement || !date) {
         return sendJson(response, 400, { error: 'Faltan datos de la asistencia' });
     }
@@ -30,18 +42,30 @@ module.exports = async function attendance(request, response) {
 
     const image = Buffer.from(match[2], 'base64');
     const form = new FormData();
-    form.append('chat_id', chatId);
+    form.append('chat_id', String(chatId));
     form.append('photo', new Blob([image], { type: match[1] }), `${user.id}-${Date.now()}.jpg`);
     const movementLabel = movement === 'Salida' ? 'Salida registrada' : 'Entrada registrada';
-    form.append('caption', `✅ ${movementLabel}\n👤 ${user.name}\n🪪 ${user.id}\n📌 ${movement}\n🕒 ${date}`);
+    const countsLine = movement === 'Salida' && (newMembers != null || oldMembers != null)
+        ? `\n👥 Socios nuevos: ${Number(newMembers) || 0} · Socios antiguos: ${Number(oldMembers) || 0}`
+        : '';
+    const caption = `✅ ${movementLabel}\n👤 ${user.name}\n🪪 ${user.id}\n📌 ${movement}\n🕒 ${date}${countsLine}`;
+    form.append('caption', caption);
 
-    const telegramResponse = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
-        method: 'POST',
-        body: form
-    });
-    if (!telegramResponse.ok) {
-        return sendJson(response, 502, { error: 'Telegram rechazó el envío' });
+    const telegramPhoto = await telegramRequest(token, 'sendPhoto', form);
+    if (telegramPhoto.ok) {
+        return sendJson(response, 200, { ok: true });
     }
 
-    return sendJson(response, 200, { ok: true });
+    const description = telegramPhoto.result?.description || 'Telegram rechazó el envío';
+    const fallbackText = caption;
+    const telegramMessage = await telegramRequest(token, 'sendMessage', { chat_id: String(chatId), text: fallbackText });
+    if (telegramMessage.ok) {
+        return sendJson(response, 200, { ok: true, fallback: true });
+    }
+
+    const fallbackDescription = telegramMessage.result?.description || description;
+    return sendJson(response, telegramPhoto.status || 502, {
+        error: fallbackDescription,
+        detail: 'Revisa que el chat_id sea el correcto y que hayas iniciado el bot en ese chat privado.'
+    });
 };
