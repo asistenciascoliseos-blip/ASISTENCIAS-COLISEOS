@@ -32,7 +32,8 @@ module.exports = async function attendance(request, response) {
     const form = new FormData();
     form.append('chat_id', chatId);
     form.append('photo', new Blob([image], { type: match[1] }), `${user.id}-${Date.now()}.jpg`);
-    form.append('caption', `✅ Asistencia registrada\n👤 ${user.name}\n🪪 ${user.id}\n📌 ${movement}\n🕒 ${date}`);
+    const movementLabel = movement === 'Salida' ? 'Salida registrada' : 'Entrada registrada';
+    form.append('caption', `✅ ${movementLabel}\n👤 ${user.name}\n🪪 ${user.id}\n📌 ${movement}\n🕒 ${date}`);
 
     const telegramResponse = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
         method: 'POST',
