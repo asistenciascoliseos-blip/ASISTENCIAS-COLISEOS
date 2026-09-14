@@ -30,7 +30,7 @@ module.exports = async function attendance(request, response) {
     }
 
     const body = typeof request.body === 'string' ? JSON.parse(request.body) : request.body;
-    const { photo, user, movement, date, newMembers, oldMembers } = body || {};
+    const { photo, user, movement, date, newMembers, oldMembers, newCards, renewedCards } = body || {};
     if (!photo || !user?.name || !user?.id || !movement || !date) {
         return sendJson(response, 400, { error: 'Faltan datos de la asistencia' });
     }
@@ -45,8 +45,8 @@ module.exports = async function attendance(request, response) {
     form.append('chat_id', String(chatId));
     form.append('photo', new Blob([image], { type: match[1] }), `${user.id}-${Date.now()}.jpg`);
     const movementLabel = movement === 'Salida' ? 'Salida registrada' : 'Entrada registrada';
-    const countsLine = movement === 'Salida' && (newMembers != null || oldMembers != null)
-        ? `\n👥 Socios nuevos: ${Number(newMembers) || 0} · Socios antiguos: ${Number(oldMembers) || 0}`
+    const countsLine = movement === 'Salida' && [newMembers, oldMembers, newCards, renewedCards].some((value) => value != null)
+        ? `\n👥 Socios nuevos: ${Number(newMembers) || 0} · Socios antiguos: ${Number(oldMembers) || 0}\n📒 Cartillas nuevas: ${Number(newCards) || 0} · Cartillas renovadas: ${Number(renewedCards) || 0}`
         : '';
     const caption = `✅ ${movementLabel}\n👤 ${user.name}\n🪪 ${user.id}\n📌 ${movement}\n🕒 ${date}${countsLine}`;
     form.append('caption', caption);
