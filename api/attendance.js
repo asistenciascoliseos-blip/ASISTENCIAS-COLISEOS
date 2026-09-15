@@ -37,7 +37,7 @@ module.exports = async function attendance(request, response) {
     } catch (error) {
         return sendJson(response, 400, { error: 'La solicitud no tiene un formato válido' });
     }
-    const { photo, user, movement, date, newMembers, oldMembers, newCards, renewedCards } = body || {};
+    const { photo, user, movement, date, newMembers, oldMembers, freeCount, newCards, renewedCards } = body || {};
     if (!photo || !user?.name || !user?.id || !movement || !date) {
         return sendJson(response, 400, { error: 'Faltan datos de la asistencia' });
     }
@@ -56,9 +56,9 @@ module.exports = async function attendance(request, response) {
         ? Math.floor(Number(value))
         : 0;
     const hasCounts = movement === 'Salida' &&
-        [newMembers, oldMembers, newCards, renewedCards].some((value) => value != null);
+        [newMembers, oldMembers, freeCount, newCards, renewedCards].some((value) => value != null);
     const countsLine = hasCounts
-        ? `\n👥 Socios nuevos: ${count(newMembers)} · Socios antiguos: ${count(oldMembers)}\n📒 Cartillas nuevas: ${count(newCards)} · Cartillas renovadas: ${count(renewedCards)}`
+        ? `\n👤 Socio: ${count(oldMembers)} · Socio nuevo: ${count(newMembers)}\n🟢 Libre: ${count(freeCount)}\n📒 Cartillas nuevas: ${count(newCards)} · Cartillas renovadas: ${count(renewedCards)}`
         : '';
     const caption = `✅ ${movementLabel}\n👤 ${user.name}\n🪪 ${user.id}\n📌 ${movement}\n🕒 ${date}${countsLine}`;
     form.append('caption', caption);
