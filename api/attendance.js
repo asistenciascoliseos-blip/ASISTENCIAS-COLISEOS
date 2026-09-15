@@ -58,7 +58,7 @@ module.exports = async function attendance(request, response) {
     const hasCounts = movement === 'Salida' &&
         [newMembers, oldMembers, freeCount, newCards, renewedCards].some((value) => value != null);
     const countsLine = hasCounts
-        ? `\n👤 Socio: ${count(oldMembers)} · Socio nuevo: ${count(newMembers)}\n🟢 Libre: ${count(freeCount)}\n📒 Cartillas nuevas: ${count(newCards)} · Cartillas renovadas: ${count(renewedCards)}`
+        ? `\n👤 Socio: ${count(oldMembers)}\n👥 Socios nuevos: ${count(newMembers)}\n🟢 Libre: ${count(freeCount)}\n📒 Cartilla nueva: ${count(newCards)}\n📒 Cartilla renovada: ${count(renewedCards)}`
         : '';
     const caption = `✅ ${movementLabel}\n👤 ${user.name}\n🪪 ${user.id}\n📌 ${movement}\n🕒 ${date}${countsLine}`;
     form.append('caption', caption);
