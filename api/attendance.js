@@ -60,7 +60,8 @@ module.exports = async function attendance(request, response) {
     const countsLine = hasCounts
         ? `\n👤 Socio: ${count(oldMembers)}\n👥 Socios nuevos: ${count(newMembers)}\n🟢 Libre: ${count(freeCount)}\n📒 Cartilla nueva: ${count(newCards)}\n📒 Cartilla renovada: ${count(renewedCards)}`
         : '';
-    const caption = `✅ ${movementLabel}\n👤 ${user.name}\n🪪 ${user.id}\n📌 ${movement}\n🕒 ${date}${countsLine}`;
+    const locationLine = [user.sede, user.turno].filter(Boolean).join(' · ');
+    const caption = `✅ ${movementLabel}\n👤 ${user.name}\n🪪 ${user.id}${locationLine ? `\n📍 ${locationLine}` : ''}\n📌 ${movement}\n🕒 ${date}${countsLine}`;
     form.append('caption', caption);
 
     const telegramPhoto = await telegramRequest(token, 'sendPhoto', form);
