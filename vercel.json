@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "api/attendance.js": {
-      "maxDuration": 30
-    }
-  }
-}
