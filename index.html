@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#e5ebf6">
+    <title>Asistencias QR</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="redesign.css">
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <a class="brand" href="#" aria-label="Asistencias, inicio">
+            <span class="brand-mark" aria-hidden="true">A</span>
+            <span class="brand-copy"><strong>asistencias</strong><small>CONTROL DE ACCESO</small></span>
+        </a>
+
+        <p class="nav-caption">MENÚ PRINCIPAL</p>
+        <nav aria-label="Navegación principal">
+            <button class="nav-item active" data-view="registro"><span class="nav-icon" aria-hidden="true">▦</span>Registrar</button>
+            <button class="nav-item admin-only hidden" data-view="generador"><span class="nav-icon" aria-hidden="true">⌗</span>Usuarios y QR</button>
+            <button class="nav-item admin-only hidden" data-view="historial"><span class="nav-icon" aria-hidden="true">◷</span>Historial</button>
+            <button class="nav-item admin-only hidden" data-view="configuracion"><span class="nav-icon" aria-hidden="true">⚙</span>Integraciones</button>
+        </nav>
+
+        <div class="sidebar-spacer"></div>
+        <div class="sidebar-status"><span class="status-light"></span><span><strong>Sistema operativo</strong><small>Control de asistencias</small></span></div>
+        <div class="sidebar-foot">Panel de control <span>·</span> v1.0</div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="breadcrumb"><span>Panel</span><span class="breadcrumb-separator">/</span><strong id="page-title">Registrar asistencia</strong></div>
+            <div class="topbar-actions">
+                <span class="status-pill"><i></i> Sistema activo</span>
+                <button id="admin-toggle" class="secondary-button"><span aria-hidden="true">♙</span> Acceso OP</button>
+            </div>
+        </header>
+
+        <section id="registro" class="view active-view">
+            <div class="station-banner">
+                <div class="station-copy">
+                    <p class="eyebrow">PUNTO DE CONTROL <span class="banner-dot"></span> REGISTRO ACTIVO</p>
+                    <h1>Control de jornada</h1>
+                    <p>Prepara el movimiento y escanea la identificación para registrar la asistencia.</p>
+                </div>
+                <div class="station-time"><span class="time-symbol" aria-hidden="true">◷</span><div><small id="today-label"></small><strong id="clock-label"></strong></div></div>
+            </div>
+
+            <div class="desk-heading">
+                <div><span class="desk-heading-mark"></span><span>TERMINAL DE ASISTENCIA</span></div>
+                <span>El registro requiere identificación y fotografía</span>
+            </div>
+
+            <div class="registration-grid attendance-console">
+                <section class="card details-card control-card" aria-labelledby="movement-title">
+                    <div class="card-heading">
+                        <div class="heading-with-icon">
+                            <span class="section-icon movement-icon" aria-hidden="true">↗</span>
+                            <div><p class="card-kicker">CONFIGURACIÓN</p><h2 id="movement-title">Tipo de movimiento</h2><p class="muted">¿Qué acción deseas registrar?</p></div>
+                        </div>
+                    </div>
+
+                    <div class="movement-options">
+                        <button class="movement" data-movement="Entrada"><span class="movement-symbol entry-symbol" aria-hidden="true">↓</span><span class="movement-copy"><b>Entrada</b><small>Inicio de jornada</small></span><span class="movement-check" aria-hidden="true"></span></button>
+                        <button class="movement" data-movement="Salida"><span class="movement-symbol exit-symbol" aria-hidden="true">↑</span><span class="movement-copy"><b>Salida</b><small>Fin de jornada</small></span><span class="movement-check" aria-hidden="true"></span></button>
+                    </div>
+                    <p id="movement-message" class="movement-message hidden">Seleccione su turno para continuar</p>
+
+                    <div id="exit-counts" class="exit-counts hidden">
+                        <p class="count-instruction">Completa las cantidades correspondientes a esta salida.</p>
+                        <label>Socio<input id="old-members-count" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label>
+                        <label>Socios nuevos<input id="new-members-count" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label>
+                        <label>Libre<input id="free-count" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label>
+                        <label>Cartilla nueva<input id="new-cards-count" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label>
+                        <label>Cartilla renovada<input id="renewed-cards-count" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></label>
+                    </div>
+
+                    <div class="control-divider"></div>
+                    <div class="user-summary-label"><span>USUARIO IDENTIFICADO</span><span>QR</span></div>
+                    <div id="user-preview" class="user-preview empty"><div class="avatar">?</div><div><strong>Esperando usuario</strong><p>El perfil aparecerá al leer el QR</p></div></div>
+                    <div class="confirm-block">
+                        <span class="confirm-step">SIGUIENTE ACCIÓN</span>
+                        <button id="capture-button" class="primary-button full" disabled><span aria-hidden="true">◉</span> Abrir cámara y confirmar <span class="button-arrow">→</span></button>
+                    </div>
+                </section>
+
+                <section class="card scanner-card camera-console" aria-labelledby="scanner-title">
+                    <div class="camera-console-header">
+                        <div><p class="card-kicker">IDENTIFICACIÓN</p><h2 id="scanner-title">Escáner de credencial</h2><p class="muted">Mantén el código visible y centrado.</p></div>
+                        <span class="camera-badge"><i></i> LECTOR QR</span>
+                    </div>
+
+                    <div class="scan-frame">
+                        <div class="scan-frame-top"><span>LECTOR PRINCIPAL</span><span id="scan-live-status" class="scan-live"><i></i><span id="scan-status-label">EN ESPERA</span></span></div>
+                        <div class="scan-corner top-left"></div><div class="scan-corner top-right"></div>
+                        <div class="scan-corner bottom-left"></div><div class="scan-corner bottom-right"></div>
+                        <div id="reader" class="reader"><div class="reader-placeholder"><span aria-hidden="true">⌗</span><p>La cámara aparecerá aquí</p></div></div>
+                        <div class="camera-zoom" aria-label="Control de zoom de la cámara">
+                            <button id="zoom-out" type="button" aria-label="Alejar cámara" disabled>−</button>
+                            <input id="camera-zoom" type="range" min="1" max="2.5" step="0.1" value="1" aria-label="Zoom de la cámara" disabled>
+                            <button id="zoom-in" type="button" aria-label="Acercar cámara" disabled>+</button>
+                            <output id="zoom-value" for="camera-zoom">1.0×</output>
+                        </div>
+                        <span class="scan-instruction">ALINEA EL QR DENTRO DEL ÁREA DE LECTURA</span>
+                    </div>
+
+                    <button id="start-scanner" class="primary-button scanner-start"><span aria-hidden="true">◉</span> Activar escáner</button>
+                    <p id="scanner-message" class="helper">También puedes utilizar uno de los métodos alternativos.</p>
+
+                    <div class="alternate-entry">
+                        <div class="alternate-title"><span>O BIEN</span><span></span></div>
+                        <div class="manual-entry">
+                            <label for="manual-code">Ingresar número de empleado</label>
+                            <div class="manual-row"><input id="manual-code" autocomplete="off" placeholder="Ej. empleado-001"><button id="manual-submit" class="secondary-button">Buscar <span aria-hidden="true">→</span></button></div>
+                        </div>
+                        <label class="gallery-button secondary-button" for="qr-image"><span aria-hidden="true">▧</span> Cargar QR como imagen</label>
+                        <input id="qr-image" class="hidden" type="file" accept="image/*">
+                    </div>
+                </section>
+            </div>
+
+            <div id="photo-panel" class="card photo-panel hidden">
+                <div class="card-heading"><div><p class="card-kicker">PASO 3</p><h2>Confirmar asistencia</h2><p class="muted">Toma una foto clara para completar el registro.</p></div><button id="close-photo" class="icon-button" aria-label="Cerrar">×</button></div>
+                <div class="photo-grid">
+                    <div class="photo-camera"><video id="photo-video" autoplay playsinline></video><canvas id="photo-canvas" hidden></canvas><div class="photo-actions"><button id="take-photo" class="primary-button">Tomar foto</button><button id="send-attendance" class="primary-button hidden">Enviar asistencia</button></div></div>
+                    <div class="photo-result"><img id="photo-preview" alt="Vista previa de la asistencia"><div id="attendance-summary" class="summary-box"></div><p class="helper">Después de tomar la foto, pulsa “Enviar asistencia”.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="generador" class="view">
+            <div class="page-heading">
+                <div><p class="eyebrow">ADMINISTRACIÓN</p><h1>Usuarios y códigos QR</h1><p class="page-subtitle">Crea y administra las identificaciones del personal.</p></div>
+            </div>
+            <div id="admin-lock" class="card admin-lock">
+                <span class="section-icon admin-icon" aria-hidden="true">♙</span><p class="card-kicker">ACCESO RESTRINGIDO</p><h2>Área de administrador</h2><p class="muted">Ingresa tus credenciales para administrar usuarios y códigos QR.</p>
+                <label for="admin-user">Usuario OP</label><input id="admin-user" placeholder="Usuario OP">
+                <label for="admin-password">Contraseña</label><div class="manual-row"><input id="admin-password" type="password" placeholder="Contraseña"><button id="unlock-admin" class="primary-button">Ingresar</button></div>
+                <p id="admin-message" class="helper"></p>
+            </div>
+            <div id="generator-content" class="generator-grid hidden">
+                <div class="card form-card">
+                    <div class="card-heading"><div><p class="card-kicker">NUEVA IDENTIFICACIÓN</p><h2>Datos del usuario</h2><p class="muted">Los campos con * son obligatorios.</p></div></div>
+                    <label>Nombre completo *<input id="qr-name" placeholder="Ej. Ana García"></label>
+                    <label>ID o número de empleado *<input id="qr-id" placeholder="Ej. empleado-001"></label>
+                    <label>Área<input id="qr-area" placeholder="Ej. Ventas"></label>
+                    <label>Foto del usuario<input id="qr-photo" type="file" accept="image/*"><small class="muted">Opcional. Se mostrará al identificar al usuario.</small></label>
+                    <img id="qr-photo-preview" class="profile-photo-preview hidden" alt="Vista previa del usuario">
+                    <button id="generate-qr" class="primary-button full">Generar código QR <span aria-hidden="true">→</span></button>
+                    <label class="gallery-button secondary-button" for="import-qr-image">Cargar QR existente</label><input id="import-qr-image" class="hidden" type="file" accept="image/*">
+                    <p id="generator-message" class="helper"></p>
+                </div>
+                <div class="card qr-result"><p class="card-kicker">VISTA PREVIA</p><div id="qrcode"></div><strong id="qr-result-name">Tu QR aparecerá aquí</strong><span id="qr-result-id" class="muted"></span><button id="download-qr" class="secondary-button" disabled>Descargar identificación</button></div>
+            </div>
+            <div id="profile-manager" class="card profile-manager hidden">
+                <div class="card-heading"><div><p class="card-kicker">DIRECTORIO</p><h2>Usuarios registrados</h2><p id="profile-count" class="muted">0 usuarios</p></div><input id="profile-search" class="profile-search" placeholder="Buscar usuario o ID"></div>
+                <div id="profile-list" class="profile-list"></div>
+            </div>
+        </section>
+
+        <section id="historial" class="view">
+            <div class="page-heading">
+                <div><p class="eyebrow">ACTIVIDAD</p><h1>Historial de asistencias</h1><p class="page-subtitle">Registros guardados en este dispositivo.</p></div>
+                <button id="clear-history" class="secondary-button">Limpiar historial</button>
+            </div>
+            <div class="card table-wrap"><table><thead><tr><th>Usuario</th><th>Movimiento</th><th>Fecha y hora</th><th>Telegram</th></tr></thead><tbody id="history-body"></tbody></table><div id="empty-history" class="empty-state">Aún no hay asistencias registradas.</div></div>
+        </section>
+
+        <section id="configuracion" class="view">
+            <div class="page-heading"><div><p class="eyebrow">INTEGRACIONES</p><h1>Configuración de Telegram</h1><p class="page-subtitle">Estado de la conexión para el envío de asistencias.</p></div></div>
+            <div class="card form-card config-card">
+                <div class="integration-heading"><span class="telegram-mark" aria-hidden="true">➤</span><div><p class="card-kicker">CANAL DE NOTIFICACIONES</p><h2>Telegram</h2><p class="muted">El bot se configura de forma segura en el servidor.</p></div></div>
+                <div class="notice">Telegram está protegido: el token no se guarda en los celulares ni se publica en GitHub. El servidor enviará cada foto al Chat ID configurado.</div>
+                <div class="backend-status"><i></i><div><strong>Envío seguro activado</strong><p class="muted">Chat configurado: 1121027100</p></div></div>
+                <p class="helper">Para cambiar el bot, modifica las variables secretas del proyecto en Vercel: <b>TELEGRAM_BOT_TOKEN</b> y <b>TELEGRAM_CHAT_ID</b>. Si es un chat privado, primero inicia el bot con <b>/start</b> desde ese chat y usa el ID real del usuario.</p>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div id="edit-profile-modal" class="admin-modal hidden">
+    <div class="admin-modal-card">
+        <button id="close-edit-profile" class="icon-button" aria-label="Cerrar">×</button>
+        <p class="card-kicker">DIRECTORIO</p><h2>Editar usuario</h2>
+        <input id="edit-profile-original-id" type="hidden">
+        <label for="edit-profile-name">Nombre completo</label><input id="edit-profile-name" placeholder="Nombre completo">
+        <label for="edit-profile-id">ID o número de empleado</label><input id="edit-profile-id" placeholder="ID o número de empleado">
+        <label for="edit-profile-area">Área</label><input id="edit-profile-area" placeholder="Área">
+        <label class="edit-photo-label">Cambiar foto<input id="edit-profile-photo" type="file" accept="image/*"></label>
+        <button id="save-edit-profile" class="primary-button full">Guardar cambios</button>
+        <p id="edit-profile-message" class="helper"></p>
+    </div>
+</div>
+
+<div id="admin-login" class="admin-modal hidden">
+    <div class="admin-modal-card">
+        <button id="close-admin-login" class="icon-button" aria-label="Cerrar">×</button>
+        <span class="section-icon admin-icon" aria-hidden="true">♙</span><p class="card-kicker">PANEL DE CONTROL</p><h2>Acceso de administrador</h2><p class="muted">Los trabajadores no necesitan iniciar sesión.</p>
+        <label for="login-user">Usuario OP</label><input id="login-user" placeholder="Usuario OP">
+        <label for="login-password">Contraseña</label><input id="login-password" type="password" placeholder="Contraseña">
+        <button id="login-submit" class="primary-button full">Entrar como OP</button>
+        <p id="login-message" class="helper"></p>
+    </div>
+</div>
+<div id="toast" class="toast"></div>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
